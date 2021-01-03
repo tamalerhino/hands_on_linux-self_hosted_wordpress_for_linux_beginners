@@ -4,6 +4,9 @@ Code and configuration snippets for the [Hands-on Linux: Self-Hosted WordPress f
 
 ## Changelog:
 
+#### January 2021
+- created all_instructions_no_commands.md to add a challange
+
 #### July 2020
 - updated instructions for Ubuntu 20.04
 - nginx can now be installed from Ubuntu's package repositories, hooray!
