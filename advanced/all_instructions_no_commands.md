@@ -1,26 +1,29 @@
 # Install Required software for our Hosting Platform
-On your Webserver (as root)
+On your Webserver (as **root**)
 
-**Update and Upgrade software repos.**
+### 1. Update and Upgrade software repos.
 
-## Install the following software
+### 2. Install the following software
     1. mysql-server
     2. nginx php-mysql php-fpm monit
 
-## Start the following software
+### 3. Start the following software
 ```
 nginx php7.4-fpm monit
 ```
-## Enable the following software
+### 4. Enable the following software
 ```
 mysql nginx php7.4-fpm monit
 ```
 
 # Basic nginx Configuration
 
-Go to `/etc/nginx/`.
-Rename `nginx.conf` to `nginx.conf.ORIG` to create a backup.
-Create a new `nginx.conf` file and copy the follwing data into the file:
+### 1. Go to `/etc/nginx/`.
+
+### 2. Rename `nginx.conf` to `nginx.conf.ORIG` to create a backup.
+
+### 3. Create a new `nginx.conf` file and copy the follwing data into the file:
+
 
     user  www-data;
     worker_processes  auto;
@@ -63,7 +66,9 @@ Create a new `nginx.conf` file and copy the follwing data into the file:
         include /etc/nginx/sites-enabled/*;
     }
 
-Now create the cache directory: `/usr/share/nginx/cache/fcgi`
+### 4. Now create the cache directory: `/usr/share/nginx/cache/fcgi`
+
+
 ## Check for configuration errors
 
 Test the nginx configuration (or attempt to reload nginx) to make sure you don't have any errors:
@@ -73,28 +78,29 @@ Test the configuration without restarting/reloading the nginx service:
 ```
 nginx -t
 ```
-Or reload nginx, if it's running and you want to apply the new configuration right away
+Or **reload** nginx, if it's running and you want to apply the new configuration right away
 
 *Important*: When testing an nginx config, `[warn]`s are okay -- `[err]` means there's a problem that you need to troubleshoot and fix, and will prevent the nginx service from starting successfully.
 
 # Basic php-fpm and PHP configuration
-## Install the PHP extensions we need for WordPress
+### 1. Install the PHP extensions we need for WordPress
 
     php-json php-xmlrpc php-curl php-gd php-xml php-mbstring
 
-Now ensure that the directory for php-fpm sockets exists: `/run/php-fpm` if it does not exist create it.
+### 2. Now ensure that the directory for php-fpm sockets exists: `/run/php-fpm` if it does not exist create it.
 
-Backup the original `/etc/php/7.4/fpm/php-fpm.conf` by renaming it to `/etc/php/7.4/fpm/php-fpm.conf.ORIG`
+### 3. Backup the original `/etc/php/7.4/fpm/php-fpm.conf` by renaming it to `/etc/php/7.4/fpm/php-fpm.conf.ORIG`
 
-Create a new file `/etc/php/7.4/fpm/php-fpm.conf` and copy the following content:
+### 4. Create a new file `/etc/php/7.4/fpm/php-fpm.conf` and copy the following content:
+
     [global]
     pid = /run/php/php7.4-fpm.pid
     error_log = /var/log/php-fpm.log
     include=/etc/php/7.4/fpm/pool.d/*.conf
 
-Remove(delete) the original (default) pool file: `/etc/php/7.4/fpm/pool.d/www.conf`
+### 5. Remove(delete) the original (default) pool file: `/etc/php/7.4/fpm/pool.d/www.conf`
 
-Create a *new* default pool configuration at /etc/php/7.4/fpm/pool.d/www.conf with the following content:
+### 6. Create a *new* default pool configuration at /etc/php/7.4/fpm/pool.d/www.conf with the following content:
 
     [default]
     security.limit_extensions = .php
@@ -113,9 +119,10 @@ Create a *new* default pool configuration at /etc/php/7.4/fpm/pool.d/www.conf wi
 
 This new default pool won't be used, but I'm creating it here to prevent new students from getting confused when they try to restart php-fpm at this point in the course. We'll remove this file again later -- you don't REALLY need it.
 
-Backup the original `/etc/php/7.4/fpm/php.ini` file by renaming it to `/etc/php/7.4/fpm/php.ini.ORIG`
+### 7. Backup the original `/etc/php/7.4/fpm/php.ini` file by renaming it to `/etc/php/7.4/fpm/php.ini.ORIG`
 
-Create a new `/etc/php/7.4/fpm/php.ini` file and copy the following content:
+### 8. Create a new `/etc/php/7.4/fpm/php.ini` file and copy the following content:
+
     [PHP]
     engine = On
     short_open_tag = Off
@@ -290,13 +297,13 @@ Create a new `/etc/php/7.4/fpm/php.ini` file and copy the following content:
     [openssl]
 
 
-Restart the servie `php7.4-fpm`
+### 9. Restart the servie `php7.4-fpm`
 
 # MySQL Setup
 
 Perform the following actions as the root user.
 
-## 1. Create mysql root pass
+### 1. Create mysql root pass
 
     echo -n @ && cat /dev/urandom | env LC_CTYPE=C tr -dc [:alnum:] | head -c 15 && echo
 
@@ -306,29 +313,30 @@ This password should pass the mysql validation plugin's requirements for a 'stro
 
 *Note* You might notice the 'echo -n @' at the beginning of this password generation command. This is to get around the new password policy in MySQL version 5.5.6 and newer. Yes, it is predictable and the extra character doesn't add security, but it also doesn't make it any *less* secure. Being a sysadmin is also about being pragmatic.
 
-## 2. Run mysql_secure_installation script
+### 2. Run mysql_secure_installation script
 
     /usr/bin/mysql_secure_installation
 
 Answer 'y' to all questions and set the password policy (second question) to 0-3 (whichever one you prefer; it doesn't really affect you in this course). If this is your first time through the course, you can set the password security to 0 to ensure mysql doesn't surprise you when you're testing/experimenting with passwords.
 
-## 3. Restart `mysql` service
+### 3. Restart `mysql` service
 
 Not strictly necessary but it's good to practice working with services.
-
 
 # Set up a WordPress Site
 
 Replace all instances of 'tutorialinux' with the system username that you'll use for this site. It makes sense to use a truncated version of your domain for this, e.g. for 'tutorialinux.com' I would use 'tutorialinux'.
 
 
-Create a system user for this site called `tutorialinux`
-Create the directory `/home/tutorialinux/logs`
-Change the Owner of `/home/tutorialinux/logs/` to `tutorialinux`
-Change the Group of /home/tutorialinux/logs/` to `www-data`
+### 1. Create a system user for this site called `tutorialinux`
 
-Create the file `/etc/nginx/conf.d/tutorialinux.conf` and copy the follwing data into it:
+### 2. Create the directory `/home/tutorialinux/logs`
 
+### 3. Change the Owner of `/home/tutorialinux/logs/` to `tutorialinux`
+
+### 4. Change the Group of /home/tutorialinux/logs/` to `www-data`
+
+### 5. Create the file `/etc/nginx/conf.d/tutorialinux.conf` and copy the follwing data into it:
 
     server {
         listen       80;
@@ -416,9 +424,11 @@ Create the file `/etc/nginx/conf.d/tutorialinux.conf` and copy the follwing data
     }
 
 
-Disable default nginx vhost (only the first time you set up a website) by removing(deleting) `/etc/nginx/sites-enabled/default`
+### 6. Disable default nginx vhost (only the first time you set up a website) by removing(deleting) `/etc/nginx/sites-enabled/default`
 
-Create the new php-fpm vhost pool config file by creating the file `/etc/php/7.4/fpm/pool.d/tutorialinux.conf` and copying the following data into it. Replace all occurrences of "tutorialinux" in the configuration file content below with your site name.
+### 7. Create the new php-fpm vhost pool config file by creating the file `/etc/php/7.4/fpm/pool.d/tutorialinux.conf` and copying the following data into it. 
+
+*Replace all occurrences of "tutorialinux" in the configuration file content below with your site name.*
 
 
     [tutorialinux]
@@ -441,24 +451,25 @@ Create the new php-fpm vhost pool config file by creating the file `/etc/php/7.4
 
 
 ## Clean up the original php-fpm pool config file
-We've kept this around just to prevent errors while restarting php-fpm. Since we just created a new php-fpm pool config file, let's clean the old one by deleting `/etc/php/7.4/fpm/pool.d/www.conf`
 
-Create the php-fpm logfile `/home/tutorialinux/logs/phpfpm_error.log` as the user `tutorialinux` using `sudo -u tutorialinux`
+### 8. We've kept this around just to prevent errors while restarting php-fpm. Since we just created a new php-fpm pool config file, let's clean the old one by deleting `/etc/php/7.4/fpm/pool.d/www.conf`
 
-## Create Site Database + DB User
+### 9. Create the php-fpm logfile `/home/tutorialinux/logs/phpfpm_error.log` as the user `tutorialinux` using `sudo -u tutorialinux`
 
-First, create a new mysql password for your wordpress site. You can do this in any Linux shell, local or remote:
+# Create Site Database + DB User
+
+### 1. First, create a new mysql password for your wordpress site. You can do this in any Linux shell, local or remote:
 
     # Create password
     echo -n @ && cat /dev/urandom | env LC_CTYPE=C tr -dc [:alnum:] | head -c 15 && echo
 
-Now log into your mysql database with the root account, using the password you created and saved earlier (during the mysql_secure_installation script run):
+### 2. Now log into your mysql database with the root account, using the password you created and saved earlier (during the mysql_secure_installation script run):
 
     mysql -u root -p
 
 This will prompt you for the MySQL root user’s password, and then give you a database shell. This shell will let you enter the following commands to create the WordPress database and user, along with appropriate permissions. Swap out ‘yoursite’ for your truncated domain name. This name can't contain any punctuation or special characters.
 
-Replace `chooseapassword` with the strong password that you just created with the shell command above, and `tutorialinux` with your site name.
+### 3. Replace `chooseapassword` with the strong password that you just created with the shell command above, and `tutorialinux` with your site name.
 
     # Log into mysql
     CREATE DATABASE tutorialinux;
@@ -469,29 +480,30 @@ Replace `chooseapassword` with the strong password that you just created with th
 
 Great; you’re done! Hit *ctrl-d* to exit the MySQL shell.
 
-## Install WordPress
+# Install WordPress
 
 Now it's time to actually download and install the WordPress application.
 
 
-### Download WordPress
+## Download WordPress
 
 Become your site user (named tutorialinux in my case) and download the WordPress application:
 
-Switch to User `tutorialinux`
-Go to tutorialinux's home directory
+### 1. Switch to User `tutorialinux`
+
+### 2. Go to tutorialinux's home directory
     
-Download the wordpress package:
+### 3. Download the wordpress package:
+
     wget https://wordpress.org/latest.tar.gz
 
-
-### Extract Wordpress Archive (+ Clean Up)
+### 4. Extract Wordpress Archive (+ Clean Up)
 
     latest.tar.gz
-### Once you have untared(extracted it) delete:    
+### 5. Once you have untared(extracted it) delete:    
     latest.tar.gz
 
-### Rename the extracted 'wordpress' directory to `public_html`
+### 6. Rename the extracted 'wordpress' directory to `public_html`
 
 
 ### Exit the unprivileged user's shell and become root again 
@@ -499,9 +511,9 @@ Download the wordpress package:
     ctrl-d (+ENTER)
 
 
-### Set proper file permissions on your site files
+### 7. Set proper file permissions on your site files
 
-Make sure you're in your user's home/public_html directory -- I'm still using the `tutorialinux` user here for illustration:
+Make sure you're in your user's *home/public_html* directory -- I'm still using the `tutorialinux` user here for illustration:
 
     go to `/home/tutorialinux/public_html`
     chown -R tutorialinux:www-data .
@@ -509,7 +521,7 @@ Make sure you're in your user's home/public_html directory -- I'm still using th
     find . -type f -exec chmod 644 {} \;
 
 
-## Restart your services
+## 8. Restart your services
 
     php7.4-fpm
     nginx
@@ -526,9 +538,9 @@ If you don't have a domain name yet (or it's not set up with an A record to poin
 
 Make these changes on the local Linux machine you're using as a 'base' to go through this course, **not* on your remote web server that's running the WordPress site**:
 
-open `/etc/hosts`
+### 1. open `/etc/hosts`
 
-Add two lines like the following, with the IP and hostnames replaced by your WordPress server's IP address and your domain name, respectively:
+## 2. Add two lines like the following, with the IP and hostnames replaced by your WordPress server's IP address and your domain name, respectively:
 ```
 81.7.14.132    tutorialinux.com
 81.7.14.132    www.tutorialinux.com
@@ -543,4 +555,4 @@ It's a great way of testing things locally, before modifying DNS records at your
 
 You'll be able to run the installer by navigating to your server IP address in a browser. Once you've done that...
 
-Secure the wp-config.php file so other users can’t read DB credentials by schanging the mode of the `/home/tutorialinux/public_html/wp-config.php` to `640`
+### 3. Secure the wp-config.php file so other users can’t read DB credentials by schanging the mode of the `/home/tutorialinux/public_html/wp-config.php` to `640`
