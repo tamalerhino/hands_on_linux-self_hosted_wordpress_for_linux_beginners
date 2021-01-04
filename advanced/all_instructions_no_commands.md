@@ -1,11 +1,11 @@
 # Install Required software for our Hosting Platform
 On your Webserver (as root)
 
-## Update and Upgrade software repos.
+**Update and Upgrade software repos.**
 
 ## Install the following software
     1. mysql-server
-    2. nginx aphp-mysql php-fpm monit
+    2. nginx php-mysql php-fpm monit
 
 ## Start the following software
 ```
@@ -18,11 +18,9 @@ mysql nginx php7.4-fpm monit
 
 # Basic nginx Configuration
 
-## Go to `/etc/nginx/`.
-## Rename `nginx.conf` to `nginx.conf.ORIG` to create a backup.
-## Create a new `nginx.conf` file and copy the follwing data into the file:
-
-
+Go to `/etc/nginx/`.
+Rename `nginx.conf` to `nginx.conf.ORIG` to create a backup.
+Create a new `nginx.conf` file and copy the follwing data into the file:
 
     user  www-data;
     worker_processes  auto;
@@ -65,7 +63,7 @@ mysql nginx php7.4-fpm monit
         include /etc/nginx/sites-enabled/*;
     }
 
-## Now create the cache directory: `/usr/share/nginx/cache/fcgi`
+Now create the cache directory: `/usr/share/nginx/cache/fcgi`
 ## Check for configuration errors
 
 Test the nginx configuration (or attempt to reload nginx) to make sure you don't have any errors:
@@ -84,18 +82,19 @@ Or reload nginx, if it's running and you want to apply the new configuration rig
 
     php-json php-xmlrpc php-curl php-gd php-xml php-mbstring
 
-## Now ensure that the directory for php-fpm sockets exists: `/run/php-fpm` if it does not exist create it.
+Now ensure that the directory for php-fpm sockets exists: `/run/php-fpm` if it does not exist create it.
 
-## Backup the original `/etc/php/7.4/fpm/php-fpm.conf` by renaming it to `/etc/php/7.4/fpm/php-fpm.conf.ORIG`
+Backup the original `/etc/php/7.4/fpm/php-fpm.conf` by renaming it to `/etc/php/7.4/fpm/php-fpm.conf.ORIG`
 
-## Create a new file `/etc/php/7.4/fpm/php-fpm.conf` and copy the following content:
+Create a new file `/etc/php/7.4/fpm/php-fpm.conf` and copy the following content:
     [global]
     pid = /run/php/php7.4-fpm.pid
     error_log = /var/log/php-fpm.log
     include=/etc/php/7.4/fpm/pool.d/*.conf
-## Remove(delete) the original (default) pool file: `/etc/php/7.4/fpm/pool.d/www.conf`
 
-## Create a *new* default pool configuration at /etc/php/7.4/fpm/pool.d/www.conf with the following content:
+Remove(delete) the original (default) pool file: `/etc/php/7.4/fpm/pool.d/www.conf`
+
+Create a *new* default pool configuration at /etc/php/7.4/fpm/pool.d/www.conf with the following content:
 
     [default]
     security.limit_extensions = .php
@@ -114,9 +113,9 @@ Or reload nginx, if it's running and you want to apply the new configuration rig
 
 This new default pool won't be used, but I'm creating it here to prevent new students from getting confused when they try to restart php-fpm at this point in the course. We'll remove this file again later -- you don't REALLY need it.
 
-## Backup the original `/etc/php/7.4/fpm/php.ini` file by renaming it to `/etc/php/7.4/fpm/php.ini.ORIG`
+Backup the original `/etc/php/7.4/fpm/php.ini` file by renaming it to `/etc/php/7.4/fpm/php.ini.ORIG`
 
-## Create a new `/etc/php/7.4/fpm/php.ini` file and copy the following content:
+Create a new `/etc/php/7.4/fpm/php.ini` file and copy the following content:
     [PHP]
     engine = On
     short_open_tag = Off
@@ -291,7 +290,7 @@ This new default pool won't be used, but I'm creating it here to prevent new stu
     [openssl]
 
 
-## Restart the servie `php7.4-fpm`
+Restart the servie `php7.4-fpm`
 
 # MySQL Setup
 
@@ -323,12 +322,12 @@ Not strictly necessary but it's good to practice working with services.
 Replace all instances of 'tutorialinux' with the system username that you'll use for this site. It makes sense to use a truncated version of your domain for this, e.g. for 'tutorialinux.com' I would use 'tutorialinux'.
 
 
-## Create a system user for this site called `tutorialinux`
-## Create the directory `/home/tutorialinux/logs`
-## Change the Owner of `/home/tutorialinux/logs/` to `tutorialinux`
-## Change the Group of /home/tutorialinux/logs/` to `www-data`
+Create a system user for this site called `tutorialinux`
+Create the directory `/home/tutorialinux/logs`
+Change the Owner of `/home/tutorialinux/logs/` to `tutorialinux`
+Change the Group of /home/tutorialinux/logs/` to `www-data`
 
-## Create the file `/etc/nginx/conf.d/tutorialinux.conf` and copy the follwing data into it:
+Create the file `/etc/nginx/conf.d/tutorialinux.conf` and copy the follwing data into it:
 
 
     server {
@@ -417,10 +416,9 @@ Replace all instances of 'tutorialinux' with the system username that you'll use
     }
 
 
-## Disable default nginx vhost (only the first time you set up a website)
-by removing(deleting) `/etc/nginx/sites-enabled/default`
+Disable default nginx vhost (only the first time you set up a website) by removing(deleting) `/etc/nginx/sites-enabled/default`
 
-## Create the new php-fpm vhost pool config file by creating the file `/etc/php/7.4/fpm/pool.d/tutorialinux.conf` and copying the following data into it. Replace all occurrences of "tutorialinux" in the configuration file content below with your site name.
+Create the new php-fpm vhost pool config file by creating the file `/etc/php/7.4/fpm/pool.d/tutorialinux.conf` and copying the following data into it. Replace all occurrences of "tutorialinux" in the configuration file content below with your site name.
 
 
     [tutorialinux]
@@ -445,7 +443,7 @@ by removing(deleting) `/etc/nginx/sites-enabled/default`
 ## Clean up the original php-fpm pool config file
 We've kept this around just to prevent errors while restarting php-fpm. Since we just created a new php-fpm pool config file, let's clean the old one by deleting `/etc/php/7.4/fpm/pool.d/www.conf`
 
-## Create the php-fpm logfile `/home/tutorialinux/logs/phpfpm_error.log` as the user `tutorialinux` using `sudo -u tutorialinux`
+Create the php-fpm logfile `/home/tutorialinux/logs/phpfpm_error.log` as the user `tutorialinux` using `sudo -u tutorialinux`
 
 ## Create Site Database + DB User
 
@@ -545,4 +543,4 @@ It's a great way of testing things locally, before modifying DNS records at your
 
 You'll be able to run the installer by navigating to your server IP address in a browser. Once you've done that...
 
-### Secure the wp-config.php file so other users can’t read DB credentials by schanging the mode of the `/home/tutorialinux/public_html/wp-config.php` to `640`
+Secure the wp-config.php file so other users can’t read DB credentials by schanging the mode of the `/home/tutorialinux/public_html/wp-config.php` to `640`
